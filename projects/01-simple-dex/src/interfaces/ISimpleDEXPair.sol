@@ -15,13 +15,12 @@ interface ISimpleDEXPair {
     );
 
 // view functions
-    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
-    function balanceOf(address owner) external view returns (uint);
-    function totalSupply() external view returns (uint);
+    function getReserves() external view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast);
 
-// state changing functions    
+// state changing functions
+    function initialize(address _token0, address _token1) external;
     function mint(address to) external returns (uint liquidity);
-    function burn(address to) external returns (uint amountA, uint amountB);
-    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+    function burn(address to) external returns (uint amount0, uint amount1);
+    function swap(uint amount0Out, uint amount1Out, address to) external;
 
 }
