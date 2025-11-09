@@ -6,12 +6,17 @@ import "./interfaces/ISimpleDEXPair.sol";
 import "./SimpleDEXPair.sol";
 
 contract SimpleDEXFactory is ISimpleDEXFactory {
-    mapping(address => mapping(address => address)) public getPair;
+    mapping(address => mapping(address => address)) public pairs;
     address[] public allPairs;
 
     // get all pairs count
     function allPairsLength() external view returns (uint){
         return allPairs.length;
+    }
+
+    // get pair address based on the tokens' addresses
+    function getPair(address tokenA, address tokenB) external view returns (address pair){
+        return pairs[tokenA][tokenB];
     }
 
     // return pair address for tokenA-tokenB pool
