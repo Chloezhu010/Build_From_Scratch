@@ -19,8 +19,7 @@ interface ISimpleDEXRouter {
     function removeLiquidity(
         address tokenA,
         address tokenB,
-        uint amountADesired,
-        uint amountBDesired,
+        uint liquidity,
         uint amountAMin,
         uint amountBMin,
         address to,
@@ -42,7 +41,7 @@ interface ISimpleDEXRouter {
     // give exact output, return variable input
     function swapTokensforExactTokens(
         uint amountOut,
-        uint amountInMin,
+        uint amountInMax,
         address[] calldata path,
         address to,
         uint deadline
@@ -51,11 +50,8 @@ interface ISimpleDEXRouter {
 //==================================
 // Helper functions
 //==================================
-    // get output amount for exact input
-    // function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
-    // // get required input amount for exact output
-    // function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external pure returns (uint amountIn);
-
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external pure returns (uint amountIn);
     function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }
