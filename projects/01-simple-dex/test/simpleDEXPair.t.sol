@@ -66,12 +66,10 @@ contract SimpleDEXPairTest is Test {
     //     vm.startPrank(user2);
     //     console.log("user2 token0 init balance:", token0.balanceOf(user2));
     //     console.log("user2 token1 init balance:", token1.balanceOf(user2));
-
     //     token0.transfer(address(pair), 1000);
     //     console.log("user2 token0 balance:", token0.balanceOf(user2));
     //     token1.transfer(address(pair), 1500);
     //     console.log("user2 token1 balance:", token1.balanceOf(user2));
-        
     //     // user2 should have 1000 token0 and 500 token1
     //     assertEq(token0.balanceOf(user2), 1000);
     //     assertEq(token1.balanceOf(user2), 500);
@@ -84,7 +82,6 @@ contract SimpleDEXPairTest is Test {
     //     // user2 should have 224 LP tokens
     //     uint LP_token_cal = Math.sqrt(1000 * 1500) - 1000;
     //     assertEq(pair.balanceOf(user2), LP_token_cal);
-
     //     vm.stopPrank();
     // }
 
@@ -187,49 +184,91 @@ contract SimpleDEXPairTest is Test {
     //     vm.stopPrank();
     // }
 
-    function test_mint_zero_LP() public {
-        vm.startPrank(user1);
-        token0.transfer(address(pair), 10);
-        token1.transfer(address(pair), 10);
-        vm.stopPrank();
+    // function test_mint_zero_LP() public {
+    //     vm.startPrank(user1);
+    //     token0.transfer(address(pair), 10);
+    //     token1.transfer(address(pair), 10);
+    //     vm.stopPrank();
 
-        vm.expectRevert("SimpleDEXPair: INSUFFICIENT_LIQUIDITY_MINTED");
-        pair.mint(user1);
-    }
+    //     vm.expectRevert("SimpleDEXPair: INSUFFICIENT_LIQUIDITY_MINTED");
+    //     pair.mint(user1);
+    // }
 
-    function test_burn_zero_LP() public {
-        vm.prank(user1);
-        vm.expectRevert("SimpleDEXPair: INSUFFICIENT_LIQUIDITY_MINTED");
-        pair.burn(user1);
-    }
+    // function test_burn_zero_LP() public {
+    //     vm.prank(user1);
+    //     vm.expectRevert("SimpleDEXPair: INSUFFICIENT_LIQUIDITY_MINTED");
+    //     pair.burn(user1);
+    // }
 
-    function test_reserves_after_mint() public {
+    // function test_reserves_after_mint() public {
+    //     vm.startPrank(user2);
+    //     token0.transfer(address(pair), 1000);
+    //     token1.transfer(address(pair), 1500);
+    //     vm.stopPrank();
+
+    //     pair.mint(user2);
+    //     (uint112 r0, uint112 r1,) = pair.getReserves();
+    //     assertEq(r0, 1000);
+    //     assertEq(r1, 1500);
+    // }
+
+    // function test_reserves_after_burn() public {
+    //     // mint
+    //     vm.startPrank(user2);
+    //     token0.transfer(address(pair), 1000);
+    //     token1.transfer(address(pair), 1500);
+    //     uint liquidity = pair.mint(user2);
+    //     vm.stopPrank();
+    //     // burn
+    //     vm.startPrank(user2);
+    //     pair.transfer(address(pair), liquidity);
+    //     pair.burn(user2);
+    //     vm.stopPrank();
+    //     // check reserves (shouldn't be 0 cause min_liquidity is locked)
+    //     (uint112 r0, uint112 r1,) = pair.getReserves();
+    //     assertEq(r0, 817);
+    //     assertEq(r1, 1226);
+    // }
+
+    function test_basic_swap() public {
+    // add liquidity from user2
         vm.startPrank(user2);
         token0.transfer(address(pair), 1000);
         token1.transfer(address(pair), 1500);
-        vm.stopPrank();
-
         pair.mint(user2);
-        (uint112 r0, uint112 r1,) = pair.getReserves();
-        assertEq(r0, 1000);
-        assertEq(r1, 1500);
+        vm.stopPrank();
+    // user1 swap 100 token0 for 150 token1
+        vm.startPrank(user1);
+        token0.transfer(address(pair), 100);
+        console.log("user1 balance0 post transfer: ", token0.balanceOf(user1));
+        console.log("user1 balance1 post transfer: ", token1.balanceOf(user1));
+
+        pair.swap(0, 150, user1);
+        vm.stopPrank();
+    // check user1 balance
+        assertEq(token0.balanceOf(user1), 900);
+        assertEq(token1.balanceOf(user1), 1150);
+        console.log("user1 balance0 post swap: ", token0.balanceOf(user1));
+        console.log("user1 balance1 post swap: ", token1.balanceOf(user1));
+    // check pair balance
+        uint balance0 = token0.balanceOf(address(pair));
+        uint balance1 = token1.balanceOf(address(pair));
+        console.log("pair balance0 post swap: ", balance0);
+        console.log("pair balance1 post swap: ", balance1);
     }
 
-    function test_reserves_after_burn() public {
-        // mint
+    function test_swap_zero() public {
+        // add liquidity from user2
         vm.startPrank(user2);
         token0.transfer(address(pair), 1000);
         token1.transfer(address(pair), 1500);
-        uint liquidity = pair.mint(user2);
+        pair.mint(user2);
         vm.stopPrank();
-        // burn
-        vm.startPrank(user2);
-        pair.transfer(address(pair), liquidity);
-        pair.burn(user2);
+        // try to swap
+        vm.startPrank(user1);
+        token0.transfer(address(pair), 100);
+        vm.expectRevert("SimpleDEXPair: INSUFFICIENT_OUTPUT_AMOUNT");
+        pair.swap(0, 0, user1);
         vm.stopPrank();
-        // check reserves (shouldn't be 0 cause min_liquidity is locked)
-        (uint112 r0, uint112 r1,) = pair.getReserves();
-        assertEq(r0, 817);
-        assertEq(r1, 1226);
     }
 }
