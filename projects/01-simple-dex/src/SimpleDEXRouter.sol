@@ -26,7 +26,7 @@ contract SimpleDEXRouter is ISimpleDEXRouter {
 // Liquidity functions
 //==================================
     
-    function pairFor(address tokenA, address tokenB) internal view returns (address pair) {
+    function pairFor(address tokenA, address tokenB) public view returns (address pair) {
         // sort token
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB): (tokenB, tokenA);
         // create salt (must match factory's salt)
