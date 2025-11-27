@@ -160,7 +160,7 @@ contract SimpleDEXPair is ISimpleDEXPair, SimpleDEXERC20 {
     { // avoid stack too deep
         uint balance0Adj = balance0 * 1000 - amount0In * 3;
         uint balance1Adj = balance1 * 1000 - amount1In * 3;
-        require(balance0Adj * balance1Adj >= uint(r0) * uint(r1));
+        require(balance0Adj * balance1Adj >= uint(r0) * uint(r1), "SimpleDEXPair: K_VALUE_VIOLATION");
     }
     // update reserves
         _update(balance0, balance1);

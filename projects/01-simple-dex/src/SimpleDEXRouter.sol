@@ -139,8 +139,9 @@ contract SimpleDEXRouter is ISimpleDEXRouter {
             address to = i < path.length - 2? pairFor(output, path[i + 2]): _to;
             // call pair contract's swap function
             address pair = pairFor(input, output);
+            require(pair != address(0), "SimpleDEXRouter: PAIR_DOESNT_EXIST_IN_SWAP");
             ISimpleDEXPair(pair).swap(amount0Out, amount1Out, to);
-        }    
+        }
     }
 
     // give exact input, return variable output
